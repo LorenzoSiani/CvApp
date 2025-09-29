@@ -169,7 +169,7 @@ body {
 
 /* Button effects */
 .btn-glow:hover {
-  box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+  box-shadow: 0 0 20px rgba(0, 255, 73, 0.5);
   transition: box-shadow 0.3s ease;
 }
 
