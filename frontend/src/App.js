@@ -236,7 +236,7 @@ const DashboardPage = () => {
           </CardHeader>
           <CardContent>
             <Link to="/setup">
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <Button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
                 Setup Connection
               </Button>
             </Link>
@@ -318,7 +318,7 @@ const DashboardPage = () => {
               <h2 className="text-2xl font-bold text-white">Products Management</h2>
               <Dialog open={showProductModal} onOpenChange={setShowProductModal}>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  <Button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Product
                   </Button>
