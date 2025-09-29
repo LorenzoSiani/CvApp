@@ -126,17 +126,45 @@ class WordPressProduct(BaseModel):
     product_tag: List[int] = []
 
 class CreateEventRequest(BaseModel):
-    title: str
-    content: str
-    location: str
-    event_date: str
-    featured_image_url: Optional[str] = None
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field(..., max_length=10000)
+    location: str = Field(..., min_length=1, max_length=200)
+    event_date: str = Field(..., regex=r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}')
+    featured_image_url: Optional[str] = Field(None, max_length=500)
+    
+    @validator('title', 'location')
+    def sanitize_text_fields(cls, v):
+        return bleach.clean(v, tags=[], strip=True)
+    
+    @validator('content')
+    def sanitize_content(cls, v):
+        return sanitize_html(v)
+    
+    @validator('featured_image_url')
+    def validate_image_url(cls, v):
+        if v and not v.startswith(('http://', 'https://')):
+            raise ValueError('Image URL must start with http:// or https://')
+        return v
 
 class CreateProductRequest(BaseModel):
-    title: str
-    content: str
-    status: str = "draft"
-    featured_image_url: Optional[str] = None
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field(..., max_length=10000)
+    status: str = Field("draft", regex=r'^(draft|publish|private|pending)$')
+    featured_image_url: Optional[str] = Field(None, max_length=500)
+    
+    @validator('title')
+    def sanitize_title(cls, v):
+        return bleach.clean(v, tags=[], strip=True)
+    
+    @validator('content')
+    def sanitize_content(cls, v):
+        return sanitize_html(v)
+    
+    @validator('featured_image_url')
+    def validate_image_url(cls, v):
+        if v and not v.startswith(('http://', 'https://')):
+            raise ValueError('Image URL must start with http:// or https://')
+        return v
 
 # WordPress API Helper
 class WordPressAPI:
