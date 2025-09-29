@@ -129,8 +129,8 @@ class WordPressAPITester:
 
     def test_method_not_allowed(self):
         """Test method not allowed scenarios"""
-        # Try POST on GET-only endpoints
-        success1, _ = self.run_test("POST on GET endpoint", "POST", "posts", 404, data={})
+        # Try POST on GET-only endpoints (should return 405 Method Not Allowed)
+        success1, _ = self.run_test("POST on GET endpoint", "POST", "posts", 405, data={})
         return success1
 
 def main():
