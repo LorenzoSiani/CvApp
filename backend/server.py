@@ -154,7 +154,7 @@ class CreateEventRequest(BaseModel):
 class CreateProductRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., max_length=10000)
-    status: str = Field("draft", regex=r'^(draft|publish|private|pending)$')
+    status: str = Field("draft", pattern=r'^(draft|publish|private|pending)$')
     featured_image_url: Optional[str] = Field(None, max_length=500)
     
     @validator('title')
