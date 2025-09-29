@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:4.4
+    container_name: wordpress-manager-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: wordpress_manager_db
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - wordpress-manager-network
+
+  backend:
+    build: .
+    container_name: wordpress-manager-backend
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=wordpress_manager_db
+      - CORS_ORIGINS=http://localhost:3000,https://your-domain.com
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    networks:
+      - wordpress-manager-network
+    volumes:
+      - ./backend:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: node:18-alpine
+    container_name: wordpress-manager-frontend
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: >
+      sh -c "yarn install && yarn start"
+    depends_on:
+      - backend
+    networks:
+      - wordpress-manager-network
+
+  # Nginx reverse proxy (optional for production)
+  nginx:
+    image: nginx:alpine
+    container_name: wordpress-manager-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - wordpress-manager-network
+    profiles:
+      - production
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  wordpress-manager-network:
+    driver: bridge
