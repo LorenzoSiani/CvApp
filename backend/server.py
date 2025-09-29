@@ -65,11 +65,13 @@ class WordPressConfig(BaseModel):
     app_password: str = Field(..., min_length=10)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
-    @validator('site_url')
+    @field_validator('site_url')
+    @classmethod
     def validate_site_url(cls, v):
         return validate_wordpress_url(v)
     
-    @validator('username')
+    @field_validator('username')
+    @classmethod
     def validate_username(cls, v):
         # Remove any HTML/script content
         clean_username = bleach.clean(v, tags=[], strip=True)
@@ -77,7 +79,8 @@ class WordPressConfig(BaseModel):
             raise ValueError('Username must be at least 3 characters')
         return clean_username
     
-    @validator('app_password')
+    @field_validator('app_password')
+    @classmethod
     def validate_app_password(cls, v):
         # WordPress app passwords are typically 24 characters
         if len(v) < 10:
