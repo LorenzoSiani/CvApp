@@ -299,11 +299,12 @@ const DashboardPage = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-md">
+          <TabsList className="grid w-full grid-cols-5 bg-white/10 backdrop-blur-md">
             <TabsTrigger value="overview" className="text-white data-[state=active]:bg-white/20">Overview</TabsTrigger>
             <TabsTrigger value="products" className="text-white data-[state=active]:bg-white/20">Products</TabsTrigger>
             <TabsTrigger value="events" className="text-white data-[state=active]:bg-white/20">Events</TabsTrigger>
             <TabsTrigger value="posts" className="text-white data-[state=active]:bg-white/20">Posts</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-white data-[state=active]:bg-white/20">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6 mt-6">
