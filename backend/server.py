@@ -137,15 +137,18 @@ class CreateEventRequest(BaseModel):
     event_date: str = Field(..., pattern=r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}')
     featured_image_url: Optional[str] = Field(None, max_length=500)
     
-    @validator('title', 'location')
+    @field_validator('title', 'location')
+    @classmethod
     def sanitize_text_fields(cls, v):
         return bleach.clean(v, tags=[], strip=True)
     
-    @validator('content')
+    @field_validator('content')
+    @classmethod
     def sanitize_content(cls, v):
         return sanitize_html(v)
     
-    @validator('featured_image_url')
+    @field_validator('featured_image_url')
+    @classmethod
     def validate_image_url(cls, v):
         if v and not v.startswith(('http://', 'https://')):
             raise ValueError('Image URL must start with http:// or https://')
