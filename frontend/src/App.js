@@ -673,7 +673,7 @@ const EventModal = ({ onSubmit, event, onClose }) => {
           />
         </div>
         <div className="flex gap-2 pt-4">
-          <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
+          <Button type="submit" className="bg-green-600 hover:bg-green-700">
             {event ? 'Update Event' : 'Create Event'}
           </Button>
           <Button type="button" variant="outline" onClick={onClose} className="border-slate-600 text-white hover:bg-slate-700">
