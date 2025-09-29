@@ -377,13 +377,41 @@ async def create_event(event: CreateEventRequest):
         }
     }
     
-    # Try events custom post type first, fallback to posts
+    # Try multiple endpoints for creating events
     try:
+        # 1. Try events custom post type
         result = await wp_api.post("events", event_data)
-    except:
-        result = await wp_api.post("posts", event_data)
-    
-    return result
+        print("Event created via /events endpoint")
+        return result
+    except Exception as e:
+        print(f"Events endpoint failed: {e}")
+        try:
+            # 2. Try event custom post type (singular)
+            result = await wp_api.post("event", event_data)
+            print("Event created via /event endpoint")
+            return result
+        except Exception as e2:
+            print(f"Event endpoint failed: {e2}")
+            # 3. Fallback to posts with event category
+            try:
+                # Get or create event category
+                categories = await wp_api.get("categories", {"search": "event"})
+                if categories:
+                    event_category_id = categories[0]["id"]
+                else:
+                    # Create event category
+                    new_category = await wp_api.post("categories", {"name": "Events", "slug": "events"})
+                    event_category_id = new_category["id"]
+                
+                event_data["categories"] = [event_category_id]
+                result = await wp_api.post("posts", event_data)
+                print("Event created as post with event category")
+                return result
+            except Exception as e3:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Failed to create event: {str(e3)}"
+                )
 
 # WordPress Site Info
 @api_router.get("/site-info")
