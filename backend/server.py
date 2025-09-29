@@ -41,7 +41,7 @@ def sanitize_html(text: str) -> str:
     if not text:
         return ""
     return bleach.clean(text, tags=['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li'], 
-                       attributes={'a': ['href', 'title']}, strip=True)
+                       attributes={'a': ['href', 'title']}, strip=True, protocols=['http', 'https', 'mailto'])
 
 def validate_wordpress_url(url: str) -> str:
     """Validate WordPress site URL"""
