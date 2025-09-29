@@ -134,7 +134,7 @@ class CreateEventRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., max_length=10000)
     location: str = Field(..., min_length=1, max_length=200)
-    event_date: str = Field(..., regex=r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}')
+    event_date: str = Field(..., pattern=r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}')
     featured_image_url: Optional[str] = Field(None, max_length=500)
     
     @validator('title', 'location')
