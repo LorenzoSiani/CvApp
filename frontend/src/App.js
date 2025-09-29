@@ -358,7 +358,7 @@ const DashboardPage = () => {
               <h2 className="text-2xl font-bold text-white">Events Management</h2>
               <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                  <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Event
                   </Button>
