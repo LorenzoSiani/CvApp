@@ -160,15 +160,18 @@ class CreateProductRequest(BaseModel):
     status: str = Field("draft", pattern=r'^(draft|publish|private|pending)$')
     featured_image_url: Optional[str] = Field(None, max_length=500)
     
-    @validator('title')
+    @field_validator('title')
+    @classmethod
     def sanitize_title(cls, v):
         return bleach.clean(v, tags=[], strip=True)
     
-    @validator('content')
+    @field_validator('content')
+    @classmethod
     def sanitize_content(cls, v):
         return sanitize_html(v)
     
-    @validator('featured_image_url')
+    @field_validator('featured_image_url')
+    @classmethod
     def validate_image_url(cls, v):
         if v and not v.startswith(('http://', 'https://')):
             raise ValueError('Image URL must start with http:// or https://')
