@@ -35,18 +35,70 @@ app = FastAPI(title="WordPress Management Interface", version="1.0.0")
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Models
+# Input validation helpers
+def sanitize_html(text: str) -> str:
+    """Sanitize HTML content to prevent XSS attacks"""
+    if not text:
+        return ""
+    return bleach.clean(text, tags=['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li'], 
+                       attributes={'a': ['href', 'title']}, strip=True)
+
+def validate_wordpress_url(url: str) -> str:
+    """Validate WordPress site URL"""
+    if not url.startswith(('http://', 'https://')):
+        raise ValueError('URL must start with http:// or https://')
+    
+    # Remove trailing slashes
+    url = url.rstrip('/')
+    
+    # Basic URL validation
+    if not re.match(r'^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', url):
+        raise ValueError('Invalid WordPress site URL format')
+    
+    return url
+
+# Models with validation
 class WordPressConfig(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    site_url: str
-    username: str
-    app_password: str
+    site_url: str = Field(..., max_length=500)
+    username: str = Field(..., min_length=3, max_length=60)
+    app_password: str = Field(..., min_length=10)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    @validator('site_url')
+    def validate_site_url(cls, v):
+        return validate_wordpress_url(v)
+    
+    @validator('username')
+    def validate_username(cls, v):
+        # Remove any HTML/script content
+        clean_username = bleach.clean(v, tags=[], strip=True)
+        if len(clean_username) < 3:
+            raise ValueError('Username must be at least 3 characters')
+        return clean_username
+    
+    @validator('app_password')
+    def validate_app_password(cls, v):
+        # WordPress app passwords are typically 24 characters
+        if len(v) < 10:
+            raise ValueError('Application password is too short')
+        return v
 
 class WordPressConfigCreate(BaseModel):
-    site_url: str
-    username: str
-    app_password: str
+    site_url: str = Field(..., max_length=500)
+    username: str = Field(..., min_length=3, max_length=60)
+    app_password: str = Field(..., min_length=10)
+    
+    @validator('site_url')
+    def validate_site_url(cls, v):
+        return validate_wordpress_url(v)
+    
+    @validator('username')
+    def validate_username(cls, v):
+        clean_username = bleach.clean(v, tags=[], strip=True)
+        if len(clean_username) < 3:
+            raise ValueError('Username must be at least 3 characters')
+        return clean_username
 
 class WordPressPost(BaseModel):
     id: int
