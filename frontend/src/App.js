@@ -16,6 +16,34 @@ import { toast, Toaster } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Loading Screen Component
+const LoadingScreen = ({ onComplete }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onComplete();
+    }, 3000); // Show for 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-500 to-slate-900 flex items-center justify-center">
+      <div className="text-center">
+        <img 
+          src="https://customer-assets.emergentagent.com/job_wp-connect/artifacts/3oa5ol88_animated_logo_cv.gif" 
+          alt="CVLTURE Logo" 
+          className="w-48 h-48 mx-auto mb-8"
+        />
+        <div className="animate-pulse">
+          <div className="w-64 h-2 bg-green-400/30 rounded-full mx-auto">
+            <div className="h-2 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Setup Page
 const SetupPage = () => {
   const [config, setConfig] = useState({
