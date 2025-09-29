@@ -436,6 +436,24 @@ async def test_wp_connection():
             detail=f"Connection failed: {str(e)}"
         )
 
+# Check Available Post Types
+@api_router.get("/post-types")
+async def get_post_types():
+    config = await get_wp_config()
+    wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
+    
+    try:
+        post_types = await wp_api.get("types", {})
+        return {
+            "available_types": list(post_types.keys()),
+            "details": post_types
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to get post types: {str(e)}"
+        )
+
 # Include the router in the main app
 app.include_router(api_router)
 
