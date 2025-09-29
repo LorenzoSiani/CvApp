@@ -833,6 +833,12 @@ const EventModal = ({ onSubmit, event, onClose }) => {
 };
 
 function App() {
+  const [showLoading, setShowLoading] = useState(true);
+
+  if (showLoading) {
+    return <LoadingScreen onComplete={() => setShowLoading(false)} />;
+  }
+
   return (
     <div className="App">
       <BrowserRouter>
