@@ -92,11 +92,13 @@ class WordPressConfigCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=60)
     app_password: str = Field(..., min_length=10)
     
-    @validator('site_url')
+    @field_validator('site_url')
+    @classmethod
     def validate_site_url(cls, v):
         return validate_wordpress_url(v)
     
-    @validator('username')
+    @field_validator('username')
+    @classmethod
     def validate_username(cls, v):
         clean_username = bleach.clean(v, tags=[], strip=True)
         if len(clean_username) < 3:
