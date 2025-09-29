@@ -6,13 +6,17 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator, HttpUrl
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone
 import httpx
 import base64
 from urllib.parse import quote
+import re
+import bleach
+from fastapi.security import HTTPBearer
+import secrets
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
