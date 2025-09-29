@@ -466,7 +466,7 @@ const EventCard = ({ event }) => {
           <div className="flex-1">
             <CardTitle className="text-white text-lg line-clamp-2">{event.title}</CardTitle>
             <div className="flex gap-2 mt-2">
-              <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/20">
+              <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/20">
                 Event
               </Badge>
             </div>
