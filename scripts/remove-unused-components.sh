@@ -1,0 +1,83 @@
+#!/bin/bash
+# Auto-generated script to remove unused UI components
+
+echo "🧹 Cleaning up unused UI components..."
+
+echo "Removing accordion.jsx"
+rm -f frontend/src/components/ui/accordion.jsx
+echo "Removing alert.jsx"
+rm -f frontend/src/components/ui/alert.jsx
+echo "Removing alert-dialog.jsx"
+rm -f frontend/src/components/ui/alert-dialog.jsx
+echo "Removing aspect-ratio.jsx"
+rm -f frontend/src/components/ui/aspect-ratio.jsx
+echo "Removing avatar.jsx"
+rm -f frontend/src/components/ui/avatar.jsx
+echo "Removing breadcrumb.jsx"
+rm -f frontend/src/components/ui/breadcrumb.jsx
+echo "Removing calendar.jsx"
+rm -f frontend/src/components/ui/calendar.jsx
+echo "Removing carousel.jsx"
+rm -f frontend/src/components/ui/carousel.jsx
+echo "Removing checkbox.jsx"
+rm -f frontend/src/components/ui/checkbox.jsx
+echo "Removing collapsible.jsx"
+rm -f frontend/src/components/ui/collapsible.jsx
+echo "Removing command.jsx"
+rm -f frontend/src/components/ui/command.jsx
+echo "Removing context-menu.jsx"
+rm -f frontend/src/components/ui/context-menu.jsx
+echo "Removing drawer.jsx"
+rm -f frontend/src/components/ui/drawer.jsx
+echo "Removing dropdown-menu.jsx"
+rm -f frontend/src/components/ui/dropdown-menu.jsx
+echo "Removing form.jsx"
+rm -f frontend/src/components/ui/form.jsx
+echo "Removing hover-card.jsx"
+rm -f frontend/src/components/ui/hover-card.jsx
+echo "Removing input-otp.jsx"
+rm -f frontend/src/components/ui/input-otp.jsx
+echo "Removing menubar.jsx"
+rm -f frontend/src/components/ui/menubar.jsx
+echo "Removing navigation-menu.jsx"
+rm -f frontend/src/components/ui/navigation-menu.jsx
+echo "Removing pagination.jsx"
+rm -f frontend/src/components/ui/pagination.jsx
+echo "Removing popover.jsx"
+rm -f frontend/src/components/ui/popover.jsx
+echo "Removing progress.jsx"
+rm -f frontend/src/components/ui/progress.jsx
+echo "Removing radio-group.jsx"
+rm -f frontend/src/components/ui/radio-group.jsx
+echo "Removing resizable.jsx"
+rm -f frontend/src/components/ui/resizable.jsx
+echo "Removing scroll-area.jsx"
+rm -f frontend/src/components/ui/scroll-area.jsx
+echo "Removing select.jsx"
+rm -f frontend/src/components/ui/select.jsx
+echo "Removing separator.jsx"
+rm -f frontend/src/components/ui/separator.jsx
+echo "Removing sheet.jsx"
+rm -f frontend/src/components/ui/sheet.jsx
+echo "Removing skeleton.jsx"
+rm -f frontend/src/components/ui/skeleton.jsx
+echo "Removing slider.jsx"
+rm -f frontend/src/components/ui/slider.jsx
+echo "Removing sonner.jsx"
+rm -f frontend/src/components/ui/sonner.jsx
+echo "Removing switch.jsx"
+rm -f frontend/src/components/ui/switch.jsx
+echo "Removing table.jsx"
+rm -f frontend/src/components/ui/table.jsx
+echo "Removing toast.jsx"
+rm -f frontend/src/components/ui/toast.jsx
+echo "Removing toaster.jsx"
+rm -f frontend/src/components/ui/toaster.jsx
+echo "Removing toggle.jsx"
+rm -f frontend/src/components/ui/toggle.jsx
+echo "Removing toggle-group.jsx"
+rm -f frontend/src/components/ui/toggle-group.jsx
+echo "Removing tooltip.jsx"
+rm -f frontend/src/components/ui/tooltip.jsx
+
+echo "✅ Cleanup completed!"
