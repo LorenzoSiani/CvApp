@@ -82,16 +82,13 @@ const SetupPage = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="site_url" className="text-gray-200">WordPress Site URL</Label>
-              <Input
-                id="site_url"
-                value={config.site_url}
-                onChange={(e) => setConfig(prev => ({...prev, site_url: e.target.value}))}
-                placeholder="https://yoursite.com"
-                required
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+            <div className="text-center mb-6">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_wp-connect/artifacts/vgk59obo_cropped-cropped-CVLTURE_Monogram_LOCAN_066-1.png" 
+                alt="CVLTURE" 
+                className="w-16 h-16 mx-auto mb-4 opacity-80"
               />
+              <p className="text-green-400 text-sm">Connecting to CVLTURE WordPress Site</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="username" className="text-gray-200">WordPress Username</Label>
