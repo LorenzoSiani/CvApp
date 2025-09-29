@@ -424,6 +424,127 @@ const DashboardPage = () => {
               </div>
             )}
           </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6 mt-6">
+            <h2 className="text-2xl font-bold text-white mb-4">Site Analytics & Traffic Stats</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Total Visitors</CardTitle>
+                  <Users className="h-4 w-4 text-green-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">12,420</div>
+                  <p className="text-xs text-green-400">+12% from last month</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Page Views</CardTitle>
+                  <Eye className="h-4 w-4 text-blue-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">45,231</div>
+                  <p className="text-xs text-blue-400">+8% from last month</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Bounce Rate</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-yellow-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">24.5%</div>
+                  <p className="text-xs text-yellow-400">-3% from last month</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Avg. Session</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-purple-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">3m 24s</div>
+                  <p className="text-xs text-purple-400">+15% from last month</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white">Top Pages</CardTitle>
+                  <CardDescription className="text-gray-300">Most visited pages this month</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">/home</span>
+                      <span className="text-green-400 text-sm">8,234 views</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">/negozio</span>
+                      <span className="text-green-400 text-sm">5,432 views</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">/events</span>
+                      <span className="text-green-400 text-sm">3,845 views</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">/about</span>
+                      <span className="text-green-400 text-sm">2,156 views</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/10 backdrop-blur-md border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white">Traffic Sources</CardTitle>
+                  <CardDescription className="text-gray-300">Where your visitors come from</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">Direct</span>
+                      <span className="text-blue-400 text-sm">45.2%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">Social Media</span>
+                      <span className="text-purple-400 text-sm">28.7%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">Google Search</span>
+                      <span className="text-green-400 text-sm">18.9%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm">Referrals</span>
+                      <span className="text-yellow-400 text-sm">7.2%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="bg-blue-500/10 border border-blue-400/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5" />
+                  <div>
+                    <p className="text-blue-200 text-sm font-medium">Analytics Integration</p>
+                    <p className="text-blue-300 text-sm mt-1">
+                      These are demo statistics. To see real analytics data, you'll need to integrate with Google Analytics or Google Site Kit API. 
+                      The interface is ready - just add your API keys in the settings.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
       <Toaster position="top-right" />
