@@ -227,12 +227,30 @@ const DashboardPage = () => {
 
   const handleCreateEvent = async (eventData) => {
     try {
-      await axios.post(`${API}/events`, eventData);
-      toast.success('Event created successfully!');
+      if (editingEvent) {
+        await axios.put(`${API}/events/${editingEvent.id}`, eventData);
+        toast.success('Event updated successfully!');
+      } else {
+        await axios.post(`${API}/events`, eventData);
+        toast.success('Event created successfully!');
+      }
       setShowEventModal(false);
+      setEditingEvent(null);
       loadEvents();
     } catch (error) {
-      toast.error('Failed to create event');
+      toast.error(editingEvent ? 'Failed to update event' : 'Failed to create event');
+    }
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+    
+    try {
+      await axios.delete(`${API}/events/${eventId}`);
+      toast.success('Event deleted successfully!');
+      loadEvents();
+    } catch (error) {
+      toast.error('Failed to delete event');
     }
   };
 
