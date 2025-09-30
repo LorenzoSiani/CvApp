@@ -7,8 +7,8 @@ from google.analytics.data_v1beta.types import (
     Dimension,
     Metric,
     RunReportRequest,
-    OrderBy,
-    MetricOrderBy
+    OrderBy
+    # MetricOrderBy - removed due to import issues
 )
 
 class GoogleAnalyticsService:
