@@ -1012,10 +1012,25 @@ const EventModal = ({ onSubmit, event, onClose }) => {
     featured_image_url: ''
   });
 
+  // Update form data when event prop changes (for editing)
+  useEffect(() => {
+    if (event) {
+      setFormData({
+        title: event.title || '',
+        content: event.content?.replace(/<[^>]*>/g, '') || '', // Strip HTML for editing
+        location: '', // You might want to extract this from meta fields
+        event_date: '',
+        featured_image_url: ''
+      });
+    }
+  }, [event]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
-    setFormData({ title: '', content: '', location: '', event_date: '', featured_image_url: '' });
+    if (!event) {
+      setFormData({ title: '', content: '', location: '', event_date: '', featured_image_url: '' });
+    }
   };
 
   return (
