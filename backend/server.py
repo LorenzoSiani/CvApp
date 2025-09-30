@@ -420,8 +420,37 @@ async def get_events(page: int = 1, per_page: int = 10):
             detail=f"Failed to fetch events: {str(e)}"
         )
 
+@api_router.get("/events/{event_id}", response_model=WordPressPost)
+async def get_event(event_id: int):
+    """Get a single event by ID"""
+    config = await get_wp_config()
+    wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
+    
+    try:
+        event = await wp_api.get(f"eventi/{event_id}", {"_embed": True})
+        
+        return WordPressPost(
+            id=event["id"],
+            title=event["title"]["rendered"],
+            content=event["content"]["rendered"],
+            status=event["status"],
+            type=event.get("type", "evento"),
+            featured_media=event.get("featured_media"),
+            date=event["date"],
+            modified=event["modified"],
+            link=event["link"],
+            excerpt=event["excerpt"]["rendered"]
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Event not found: {str(e)}"
+        )
+
 @api_router.post("/events", response_model=Dict)
 async def create_event(event: CreateEventRequest):
+    """Create a new event using the custom post type 'eventi'"""
     config = await get_wp_config()
     wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
     
@@ -430,47 +459,76 @@ async def create_event(event: CreateEventRequest):
         "content": event.content,
         "status": "publish",
         "meta": {
-            "event_type": "event",
             "event_location": event.location,
             "event_date": event.event_date
         }
     }
     
-    # Try multiple endpoints for creating events
+    # Add featured image if provided
+    if event.featured_image_url:
+        event_data["featured_image_url"] = event.featured_image_url
+    
     try:
-        # 1. Try events custom post type
-        result = await wp_api.post("events", event_data)
-        print("Event created via /events endpoint")
+        result = await wp_api.post("eventi", event_data)
+        print(f"Event created via /eventi endpoint: {result.get('id')}")
         return result
+        
     except Exception as e:
-        print(f"Events endpoint failed: {e}")
-        try:
-            # 2. Try event custom post type (singular)
-            result = await wp_api.post("event", event_data)
-            print("Event created via /event endpoint")
-            return result
-        except Exception as e2:
-            print(f"Event endpoint failed: {e2}")
-            # 3. Fallback to posts with event category
-            try:
-                # Get or create event category
-                categories = await wp_api.get("categories", {"search": "event"})
-                if categories:
-                    event_category_id = categories[0]["id"]
-                else:
-                    # Create event category
-                    new_category = await wp_api.post("categories", {"name": "Events", "slug": "events"})
-                    event_category_id = new_category["id"]
-                
-                event_data["categories"] = [event_category_id]
-                result = await wp_api.post("posts", event_data)
-                print("Event created as post with event category")
-                return result
-            except Exception as e3:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Failed to create event: {str(e3)}"
-                )
+        print(f"Failed to create event via /eventi endpoint: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to create event: {str(e)}"
+        )
+
+@api_router.put("/events/{event_id}", response_model=Dict)
+async def update_event(event_id: int, event: CreateEventRequest):
+    """Update an existing event"""
+    config = await get_wp_config()
+    wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
+    
+    event_data = {
+        "title": event.title,
+        "content": event.content,
+        "status": "publish",
+        "meta": {
+            "event_location": event.location,
+            "event_date": event.event_date
+        }
+    }
+    
+    # Add featured image if provided
+    if event.featured_image_url:
+        event_data["featured_image_url"] = event.featured_image_url
+    
+    try:
+        result = await wp_api.put(f"eventi/{event_id}", event_data)
+        print(f"Event updated via /eventi endpoint: {event_id}")
+        return result
+        
+    except Exception as e:
+        print(f"Failed to update event {event_id}: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to update event: {str(e)}"
+        )
+
+@api_router.delete("/events/{event_id}", response_model=Dict)
+async def delete_event(event_id: int):
+    """Delete an event"""
+    config = await get_wp_config()
+    wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
+    
+    try:
+        result = await wp_api.delete(f"eventi/{event_id}")
+        print(f"Event deleted via /eventi endpoint: {event_id}")
+        return {"success": True, "message": f"Event {event_id} deleted successfully", "data": result}
+        
+    except Exception as e:
+        print(f"Failed to delete event {event_id}: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to delete event: {str(e)}"
+        )
 
 # WordPress Site Info
 @api_router.get("/site-info")
