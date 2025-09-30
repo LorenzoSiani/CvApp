@@ -633,6 +633,323 @@ const ProductModal = ({ onSubmit, product, onClose }) => {
   );
 };
 
+// Analytics Tab Component
+const AnalyticsTab = () => {
+  const [analyticsData, setAnalyticsData] = useState({
+    overview: null,
+    topPages: [],
+    trafficSources: [],
+    status: null
+  });
+  const [loading, setLoading] = useState(true);
+  const [showSetup, setShowSetup] = useState(false);
+  const [ga4Config, setGa4Config] = useState({ ga4_property_id: '' });
+
+  useEffect(() => {
+    loadAnalyticsData();
+    checkAnalyticsStatus();
+  }, []);
+
+  const loadAnalyticsData = async () => {
+    setLoading(true);
+    try {
+      // Load all analytics data in parallel
+      const [overview, topPages, trafficSources] = await Promise.all([
+        axios.get(`${API}/analytics/overview`),
+        axios.get(`${API}/analytics/top-pages`),
+        axios.get(`${API}/analytics/traffic-sources`)
+      ]);
+
+      setAnalyticsData({
+        overview: overview.data.data,
+        topPages: topPages.data.data,
+        trafficSources: trafficSources.data.data,
+        status: 'loaded'
+      });
+    } catch (error) {
+      console.error('Failed to load analytics data:', error);
+      toast.error('Failed to load analytics data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkAnalyticsStatus = async () => {
+    try {
+      const response = await axios.get(`${API}/analytics/health`);
+      setAnalyticsData(prev => ({ ...prev, status: response.data }));
+    } catch (error) {
+      console.error('Failed to check analytics status:', error);
+    }
+  };
+
+  const handleSetupGA4 = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/analytics-config`, ga4Config);
+      toast.success('Google Analytics 4 configured! Upload your service account JSON file to the backend.');
+      setShowSetup(false);
+      loadAnalyticsData();
+    } catch (error) {
+      toast.error('Failed to configure Google Analytics 4');
+    }
+  };
+
+  const getStatusColor = (status) => {
+    if (!status) return 'gray';
+    if (status.status === 'connected') return 'green';
+    if (status.status === 'demo_mode') return 'yellow';
+    return 'red';
+  };
+
+  const getStatusText = (status) => {
+    if (!status) return 'Loading...';
+    if (status.status === 'connected') return 'Google Analytics 4 Connected';
+    if (status.status === 'demo_mode') return 'Demo Mode (Connect GA4 for real data)';
+    return 'Connection Error';
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center text-white py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-4"></div>
+        <p>Loading analytics data...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-white">Site Analytics & Traffic Stats</h2>
+        <div className="flex items-center gap-4">
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
+            getStatusColor(analyticsData.status) === 'green' ? 'bg-green-500/20 text-green-300' :
+            getStatusColor(analyticsData.status) === 'yellow' ? 'bg-yellow-500/20 text-yellow-300' :
+            'bg-red-500/20 text-red-300'
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${
+              getStatusColor(analyticsData.status) === 'green' ? 'bg-green-400' :
+              getStatusColor(analyticsData.status) === 'yellow' ? 'bg-yellow-400' :
+              'bg-red-400'
+            }`}></div>
+            {getStatusText(analyticsData.status)}
+          </div>
+          <Button 
+            onClick={() => setShowSetup(true)}
+            variant="outline" 
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Setup GA4
+          </Button>
+        </div>
+      </div>
+
+      {/* Overview Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {analyticsData.overview?.total_users?.toLocaleString() || '0'}
+            </div>
+            <p className="text-xs text-green-400">Last 30 days</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">Page Views</CardTitle>
+            <Eye className="h-4 w-4 text-blue-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {analyticsData.overview?.page_views?.toLocaleString() || '0'}
+            </div>
+            <p className="text-xs text-blue-400">Last 30 days</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">Bounce Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-yellow-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {analyticsData.overview?.bounce_rate || '0%'}
+            </div>
+            <p className="text-xs text-yellow-400">Last 30 days</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">Avg. Session</CardTitle>
+            <BarChart3 className="h-4 w-4 text-purple-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {analyticsData.overview?.avg_session_duration || '0s'}
+            </div>
+            <p className="text-xs text-purple-400">Last 30 days</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Top Pages and Traffic Sources */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white">Top Pages</CardTitle>
+            <CardDescription className="text-gray-300">Most visited pages this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {analyticsData.topPages.length > 0 ? (
+                analyticsData.topPages.slice(0, 5).map((page, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm truncate">{page.title || page.path}</p>
+                      <p className="text-gray-400 text-xs">{page.path}</p>
+                    </div>
+                    <span className="text-green-400 text-sm ml-4">
+                      {page.page_views?.toLocaleString()} views
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400 text-sm">No page data available</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white">Traffic Sources</CardTitle>
+            <CardDescription className="text-gray-300">Where your visitors come from</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {analyticsData.trafficSources.length > 0 ? (
+                analyticsData.trafficSources.slice(0, 5).map((source, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <span className="text-white text-sm">{source.source_medium}</span>
+                    <div className="text-right">
+                      <span className="text-blue-400 text-sm">{source.percentage}</span>
+                      <p className="text-gray-400 text-xs">{source.sessions} sessions</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400 text-sm">No traffic source data available</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Status Card */}
+      <Card className={`border ${
+        analyticsData.status?.status === 'connected' ? 'bg-green-500/10 border-green-400/20' :
+        analyticsData.status?.status === 'demo_mode' ? 'bg-yellow-500/10 border-yellow-400/20' :
+        'bg-blue-500/10 border-blue-400/20'
+      }`}>
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className={`w-5 h-5 mt-0.5 ${
+              analyticsData.status?.status === 'connected' ? 'text-green-400' :
+              analyticsData.status?.status === 'demo_mode' ? 'text-yellow-400' :
+              'text-blue-400'
+            }`} />
+            <div>
+              <p className={`text-sm font-medium ${
+                analyticsData.status?.status === 'connected' ? 'text-green-200' :
+                analyticsData.status?.status === 'demo_mode' ? 'text-yellow-200' :
+                'text-blue-200'
+              }`}>
+                {analyticsData.status?.status === 'connected' ? 'Google Analytics 4 Connected' :
+                 analyticsData.status?.status === 'demo_mode' ? 'Demo Mode Active' :
+                 'Analytics Integration'}
+              </p>
+              <p className={`text-sm mt-1 ${
+                analyticsData.status?.status === 'connected' ? 'text-green-300' :
+                analyticsData.status?.status === 'demo_mode' ? 'text-yellow-300' :
+                'text-blue-300'
+              }`}>
+                {analyticsData.status?.message || 'Configure Google Analytics 4 to see real data from your WordPress site.'}
+              </p>
+              {analyticsData.overview?.source && (
+                <p className="text-xs text-gray-400 mt-2">
+                  Data source: {analyticsData.overview.source}
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Setup Dialog */}
+      <Dialog open={showSetup} onOpenChange={setShowSetup}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Google Analytics 4 Setup</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Connect your Google Analytics 4 property to see real data
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSetupGA4} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="ga4_property_id">GA4 Property ID</Label>
+              <Input
+                id="ga4_property_id"
+                value={ga4Config.ga4_property_id}
+                onChange={(e) => setGa4Config(prev => ({...prev, ga4_property_id: e.target.value}))}
+                placeholder="123456789"
+                required
+                className="bg-slate-700 border-slate-600 text-white"
+              />
+              <p className="text-xs text-gray-400">
+                Find this in GA4 Admin → Property Settings → Property Details
+              </p>
+            </div>
+
+            <div className="bg-blue-500/10 border border-blue-400/20 rounded-lg p-4">
+              <h4 className="text-blue-200 font-medium mb-2">Next Steps:</h4>
+              <ol className="text-sm text-blue-300 space-y-1 list-decimal list-inside">
+                <li>Create a Google Cloud service account</li>
+                <li>Download the service account JSON file</li>
+                <li>Upload it to <code className="bg-slate-700 px-1 rounded">/app/backend/service_account.json</code></li>
+                <li>Add the service account email to your GA4 property as Viewer</li>
+              </ol>
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                Save Configuration
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowSetup(false)}
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
 // Event Modal Component
 const EventModal = ({ onSubmit, event, onClose }) => {
   const [formData, setFormData] = useState({
