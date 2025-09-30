@@ -514,7 +514,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
 };
 
 // Component for individual event cards
-const EventCard = ({ event }) => {
+const EventCard = ({ event, onEdit, onDelete }) => {
   return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300">
       <CardHeader>
@@ -523,18 +523,39 @@ const EventCard = ({ event }) => {
             <CardTitle className="text-white text-lg line-clamp-2">{event.title}</CardTitle>
             <div className="flex gap-2 mt-2">
               <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/20">
-                Event
+                {event.type === 'evento' ? 'Evento' : 'Event'}
+              </Badge>
+              <Badge variant="outline" className="border-white/20 text-gray-300">
+                {event.status}
               </Badge>
             </div>
           </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-white hover:bg-white/10 p-2"
-            onClick={() => window.open(event.link, '_blank')}
-          >
-            <ExternalLink className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-white hover:bg-white/10 p-2"
+              onClick={() => onEdit(event)}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-red-400 hover:bg-red-500/10 p-2"
+              onClick={() => onDelete(event.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-white hover:bg-white/10 p-2"
+              onClick={() => window.open(event.link, '_blank')}
+            >
+              <ExternalLink className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -543,7 +564,12 @@ const EventCard = ({ event }) => {
           dangerouslySetInnerHTML={{ __html: event.excerpt }} 
         />
         <div className="text-xs text-gray-400 mt-2">
-          {new Date(event.date).toLocaleDateString()}
+          Created: {new Date(event.date).toLocaleDateString()}
+          {event.modified !== event.date && (
+            <span className="ml-2">
+              • Updated: {new Date(event.modified).toLocaleDateString()}
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>
