@@ -121,7 +121,7 @@ class GoogleAnalyticsService:
                 ],
                 date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
                 order_bys=[
-                    OrderBy(metric=MetricOrderBy(metric_name="sessions"), desc=True)
+                    OrderBy(metric={"metric_name": "sessions"}, desc=True)
                 ]
             )
             
