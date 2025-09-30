@@ -382,79 +382,43 @@ async def delete_product(product_id: int):
     result = await wp_api.delete(f"product/{product_id}")
     return result
 
-# Events Management (custom post type with multiple fallbacks)
+# Events Management (using custom post type 'eventi')
 @api_router.get("/events", response_model=List[WordPressPost])
 async def get_events(page: int = 1, per_page: int = 10):
     config = await get_wp_config()
     wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
     
-    # Try multiple endpoints for events
-    events = []
-    
-    # 1. Try events custom post type
     try:
-        events = await wp_api.get("events", {
+        # Use the correct endpoint for the custom post type 'eventi'
+        events = await wp_api.get("eventi", {
             "page": page,
             "per_page": per_page,
             "_embed": True
         })
-        print(f"Found {len(events)} events from /events endpoint")
-    except Exception as e:
-        print(f"Events endpoint failed: {e}")
+        print(f"Found {len(events)} events from /eventi endpoint")
         
-        # 2. Try event custom post type (singular)
-        try:
-            events = await wp_api.get("event", {
-                "page": page,
-                "per_page": per_page,
-                "_embed": True
-            })
-            print(f"Found {len(events)} events from /event endpoint")
-        except Exception as e2:
-            print(f"Event endpoint failed: {e2}")
-            
-            # 3. Fallback to posts with categories containing "event"
-            try:
-                # Get all categories first
-                categories = await wp_api.get("categories", {"search": "event"})
-                if categories:
-                    event_category_ids = [cat["id"] for cat in categories]
-                    events = await wp_api.get("posts", {
-                        "page": page,
-                        "per_page": per_page,
-                        "_embed": True,
-                        "categories": ",".join(map(str, event_category_ids))
-                    })
-                    print(f"Found {len(events)} posts from event categories")
-                else:
-                    # 4. Final fallback - search posts by title containing "event"
-                    events = await wp_api.get("posts", {
-                        "page": page,
-                        "per_page": per_page,
-                        "_embed": True,
-                        "search": "event"
-                    })
-                    print(f"Found {len(events)} posts from event search")
-            except Exception as e3:
-                print(f"Category fallback failed: {e3}")
-                # Return empty list if all fail
-                events = []
-    
-    return [
-        WordPressPost(
-            id=event["id"],
-            title=event["title"]["rendered"],
-            content=event["content"]["rendered"],
-            status=event["status"],
-            type=event.get("type", "post"),
-            featured_media=event.get("featured_media"),
-            date=event["date"],
-            modified=event["modified"],
-            link=event["link"],
-            excerpt=event["excerpt"]["rendered"]
+        return [
+            WordPressPost(
+                id=event["id"],
+                title=event["title"]["rendered"],
+                content=event["content"]["rendered"],
+                status=event["status"],
+                type=event.get("type", "evento"),
+                featured_media=event.get("featured_media"),
+                date=event["date"],
+                modified=event["modified"],
+                link=event["link"],
+                excerpt=event["excerpt"]["rendered"]
+            )
+            for event in events
+        ]
+        
+    except Exception as e:
+        print(f"Failed to fetch events from /eventi endpoint: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to fetch events: {str(e)}"
         )
-        for event in events
-    ]
 
 @api_router.post("/events", response_model=Dict)
 async def create_event(event: CreateEventRequest):
