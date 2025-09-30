@@ -334,27 +334,88 @@ const DashboardPage = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-white">{products.length}</div>
+                  <p className="text-xs text-blue-400">WooCommerce products</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/10 backdrop-blur-md border-white/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">Total Events</CardTitle>
-                  <Calendar className="h-4 w-4 text-purple-400" />
+                  <CardTitle className="text-sm font-medium text-white">Total Eventi</CardTitle>
+                  <Calendar className="h-4 w-4 text-green-400" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-white">{events.length}</div>
+                  <p className="text-xs text-green-400">Custom events (eventi)</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/10 backdrop-blur-md border-white/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-white">Total Posts</CardTitle>
-                  <Edit className="h-4 w-4 text-green-400" />
+                  <Edit className="h-4 w-4 text-purple-400" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-white">{posts.length}</div>
+                  <p className="text-xs text-purple-400">Blog posts & articles</p>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Quick Actions */}
+            <Card className="bg-white/10 backdrop-blur-md border-white/20">
+              <CardHeader>
+                <CardTitle className="text-white">Quick Actions</CardTitle>
+                <CardDescription className="text-gray-300">
+                  Manage your CVLTURE WordPress site content
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button 
+                    className="bg-blue-600 hover:bg-blue-700 h-12"
+                    onClick={() => {
+                      setActiveTab('products');
+                      setShowProductModal(true);
+                    }}
+                  >
+                    <Package className="w-4 h-4 mr-2" />
+                    Add Product
+                  </Button>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 h-12"
+                    onClick={() => {
+                      setActiveTab('events');
+                      setShowEventModal(true);
+                    }}
+                  >
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Create Event
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="border-white/20 text-white hover:bg-white/10 h-12"
+                    onClick={() => window.open('https://www.cvlture.it/wp-admin', '_blank')}
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    WordPress Admin
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Connection Status */}
+            <Card className="bg-green-500/10 border border-green-400/20">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <Wifi className="w-5 h-5 text-green-400 mt-0.5" />
+                  <div>
+                    <p className="text-green-200 text-sm font-medium">CVLTURE WordPress Connected</p>
+                    <p className="text-green-300 text-sm mt-1">
+                      Successfully connected to https://www.cvlture.it with full REST API access.
+                      Events endpoint: /wp-json/wp/v2/eventi
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="products" className="space-y-6 mt-6">
