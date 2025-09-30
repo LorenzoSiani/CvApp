@@ -571,6 +571,33 @@ async def get_post_types():
             detail=f"Failed to get post types: {str(e)}"
         )
 
+# Test Events Endpoint Connectivity
+@api_router.get("/test-events")
+async def test_events_endpoint():
+    """Test connectivity to the eventi endpoint"""
+    config = await get_wp_config()
+    wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
+    
+    try:
+        # Test read access to eventi endpoint
+        response = await wp_api.get("eventi", {"per_page": 1})
+        
+        return {
+            "success": True,
+            "message": f"Successfully connected to eventi endpoint",
+            "endpoint": f"{config.site_url}/wp-json/wp/v2/eventi",
+            "events_found": len(response),
+            "sample_event": response[0] if response else None
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Failed to connect to eventi endpoint: {str(e)}",
+            "endpoint": f"{config.site_url}/wp-json/wp/v2/eventi",
+            "error": str(e)
+        }
+
 # Google Analytics Integration
 from analytics_service import GoogleAnalyticsService
 
