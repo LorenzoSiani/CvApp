@@ -549,6 +549,182 @@ async def get_post_types():
             detail=f"Failed to get post types: {str(e)}"
         )
 
+# Google Analytics Integration
+from analytics_service import GoogleAnalyticsService
+
+# Analytics Configuration Model
+class AnalyticsConfig(BaseModel):
+    ga4_property_id: str = Field(..., min_length=1, max_length=50)
+    credentials_uploaded: bool = False
+
+class AnalyticsConfigCreate(BaseModel):
+    ga4_property_id: str = Field(..., min_length=1, max_length=50)
+
+# Get or create analytics service
+async def get_analytics_service():
+    try:
+        # Try to get analytics config from database
+        analytics_config = await db.analytics_config.find_one()
+        
+        if analytics_config:
+            ga_service = GoogleAnalyticsService(
+                property_id=analytics_config["ga4_property_id"],
+                credentials_path="/app/backend/service_account.json"
+            )
+            return ga_service
+        else:
+            # Return demo service if no config
+            return GoogleAnalyticsService(property_id="demo", credentials_path=None)
+    except Exception as e:
+        print(f"Analytics service error: {e}")
+        return GoogleAnalyticsService(property_id="demo", credentials_path=None)
+
+# Analytics Configuration Routes
+@api_router.post("/analytics-config", response_model=AnalyticsConfig)
+async def create_analytics_config(config: AnalyticsConfigCreate):
+    """Configure Google Analytics integration"""
+    try:
+        # Clear existing config
+        await db.analytics_config.delete_many({})
+        
+        # Create new config
+        config_dict = config.dict()
+        analytics_config = AnalyticsConfig(**config_dict, credentials_uploaded=False)
+        await db.analytics_config.insert_one(analytics_config.dict())
+        
+        return analytics_config
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to configure analytics: {str(e)}"
+        )
+
+@api_router.get("/analytics-config", response_model=AnalyticsConfig)
+async def get_analytics_config():
+    """Get current analytics configuration"""
+    config = await db.analytics_config.find_one()
+    if not config:
+        # Return default demo config
+        return AnalyticsConfig(
+            ga4_property_id="demo",
+            credentials_uploaded=False
+        )
+    return AnalyticsConfig(**config)
+
+# Analytics Data Routes
+@api_router.get("/analytics/overview")
+async def get_analytics_overview(
+    start_date: str = "30daysAgo",
+    end_date: str = "today"
+):
+    """Get analytics overview metrics"""
+    try:
+        analytics_service = await get_analytics_service()
+        metrics = await analytics_service.get_overview_metrics(start_date, end_date)
+        
+        return {
+            "success": True,
+            "data": metrics,
+            "period": {
+                "start_date": start_date,
+                "end_date": end_date
+            }
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch analytics overview: {str(e)}"
+        )
+
+@api_router.get("/analytics/top-pages")
+async def get_analytics_top_pages(
+    start_date: str = "30daysAgo",
+    end_date: str = "today",
+    limit: int = 10
+):
+    """Get top pages by page views"""
+    try:
+        analytics_service = await get_analytics_service()
+        pages = await analytics_service.get_top_pages(start_date, end_date, limit)
+        
+        return {
+            "success": True,
+            "data": pages,
+            "total": len(pages)
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch top pages: {str(e)}"
+        )
+
+@api_router.get("/analytics/traffic-sources")
+async def get_analytics_traffic_sources(
+    start_date: str = "30daysAgo",
+    end_date: str = "today"
+):
+    """Get traffic sources breakdown"""
+    try:
+        analytics_service = await get_analytics_service()
+        sources = await analytics_service.get_traffic_sources(start_date, end_date)
+        
+        return {
+            "success": True,
+            "data": sources
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch traffic sources: {str(e)}"
+        )
+
+@api_router.get("/analytics/daily-visitors")
+async def get_analytics_daily_visitors(
+    start_date: str = "30daysAgo",
+    end_date: str = "today"
+):
+    """Get daily visitor data"""
+    try:
+        analytics_service = await get_analytics_service()
+        daily_data = await analytics_service.get_daily_visitors(start_date, end_date)
+        
+        return {
+            "success": True,
+            "data": daily_data
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch daily visitors: {str(e)}"
+        )
+
+@api_router.get("/analytics/health")
+async def analytics_health_check():
+    """Check Google Analytics connection status"""
+    try:
+        analytics_service = await get_analytics_service()
+        
+        if analytics_service.available:
+            return {
+                "success": True,
+                "message": "Google Analytics 4 connected",
+                "property_id": analytics_service.property_id,
+                "status": "connected"
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Google Analytics 4 not configured - using demo data",
+                "property_id": "demo",
+                "status": "demo_mode"
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Analytics service error: {str(e)}",
+            "status": "error"
+        }
+
 # Include the router in the main app
 app.include_router(api_router)
 
