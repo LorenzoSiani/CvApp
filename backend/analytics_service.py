@@ -82,7 +82,7 @@ class GoogleAnalyticsService:
                 ],
                 date_ranges=[DateRange(start_date=start_date, end_date=end_date)],
                 order_bys=[
-                    OrderBy(metric=MetricOrderBy(metric_name="screenPageViews"), desc=True)
+                    OrderBy(metric={"metric_name": "screenPageViews"}, desc=True)
                 ],
                 limit=limit
             )
