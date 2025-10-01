@@ -1158,67 +1158,231 @@ const EventModal = ({ onSubmit, event, onClose }) => {
   const selectedMedia = mediaItems.find(item => item.id === formData.featured_media);
 
   return (
-    <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
+    <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>{event ? 'Edit Event' : 'Create New Event'}</DialogTitle>
+        <DialogTitle>{event ? 'Edit Evento' : 'Create New Evento'}</DialogTitle>
         <DialogDescription className="text-gray-400">
-          Add a new event to your WordPress site
+          Manage your CVLTURE event details
         </DialogDescription>
       </DialogHeader>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Event Title *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
+              placeholder="Enter event title"
+              required
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="luogo_evento">Venue *</Label>
+            <Input
+              id="luogo_evento"
+              value={formData.luogo_evento}
+              onChange={(e) => setFormData(prev => ({...prev, luogo_evento: e.target.value}))}
+              placeholder="Event venue"
+              required
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+        </div>
+
+        {/* Date and Time */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="data_evento">Event Date *</Label>
+            <Input
+              id="data_evento"
+              type="date"
+              value={formData.data_evento}
+              onChange={(e) => setFormData(prev => ({...prev, data_evento: e.target.value}))}
+              required
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="ora_evento">Event Time *</Label>
+            <Input
+              id="ora_evento"
+              type="time"
+              value={formData.ora_evento}
+              onChange={(e) => setFormData(prev => ({...prev, ora_evento: e.target.value}))}
+              required
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+        </div>
+
+        {/* People Information */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="dj">DJ</Label>
+            <Input
+              id="dj"
+              value={formData.dj}
+              onChange={(e) => setFormData(prev => ({...prev, dj: e.target.value}))}
+              placeholder="DJ name"
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="host">Host</Label>
+            <Input
+              id="host"
+              value={formData.host}
+              onChange={(e) => setFormData(prev => ({...prev, host: e.target.value}))}
+              placeholder="Host name"
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location">Additional Location</Label>
+            <Input
+              id="location"
+              value={formData.location}
+              onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
+              placeholder="Additional location info"
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+        </div>
+
+        {/* Categories */}
+        {categories.length > 0 && (
+          <div className="space-y-2">
+            <Label>Event Categories</Label>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <label
+                  key={category.id}
+                  className="flex items-center space-x-2 bg-slate-700 rounded px-3 py-2 cursor-pointer hover:bg-slate-600"
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.categorie_eventi.includes(category.id)}
+                    onChange={() => handleCategoryChange(category.id)}
+                    className="rounded"
+                  />
+                  <span className="text-white text-sm">{category.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Featured Image */}
         <div className="space-y-2">
-          <Label htmlFor="title">Event Title</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
-            placeholder="Enter event title"
-            required
+          <Label>Featured Image</Label>
+          {selectedMedia ? (
+            <div className="flex items-center gap-4 p-4 bg-slate-700 rounded-lg">
+              <img src={selectedMedia.thumbnail} alt="Selected" className="w-16 h-16 object-cover rounded" />
+              <div className="flex-1">
+                <p className="text-white">{selectedMedia.title}</p>
+                <p className="text-gray-400 text-sm">ID: {selectedMedia.id}</p>
+              </div>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setFormData(prev => ({...prev, featured_media: null}))}
+                className="border-slate-600 text-white hover:bg-slate-600"
+              >
+                Remove
+              </Button>
+            </div>
+          ) : (
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setShowMediaPicker(true)}
+              className="border-slate-600 text-white hover:bg-slate-600"
+            >
+              Select Featured Image
+            </Button>
+          )}
+        </div>
+
+        {/* Guest Information */}
+        <div className="space-y-2">
+          <Label htmlFor="guest">Guest Information</Label>
+          <Textarea
+            id="guest"
+            value={formData.guest}
+            onChange={(e) => setFormData(prev => ({...prev, guest: e.target.value}))}
+            placeholder="Special guests, performers, etc."
+            rows={2}
             className="bg-slate-700 border-slate-600 text-white"
           />
         </div>
+
+        {/* Description */}
         <div className="space-y-2">
-          <Label htmlFor="location">Location</Label>
-          <Input
-            id="location"
-            value={formData.location}
-            onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
-            placeholder="Event location"
-            required
-            className="bg-slate-700 border-slate-600 text-white"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="event_date">Event Date</Label>
-          <Input
-            id="event_date"
-            type="datetime-local"
-            value={formData.event_date}
-            onChange={(e) => setFormData(prev => ({...prev, event_date: e.target.value}))}
-            required
-            className="bg-slate-700 border-slate-600 text-white"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="content">Event Description</Label>
+          <Label htmlFor="content">Event Description *</Label>
           <Textarea
             id="content"
             value={formData.content}
             onChange={(e) => setFormData(prev => ({...prev, content: e.target.value}))}
-            placeholder="Enter event description"
+            placeholder="Enter detailed event description"
             rows={4}
+            required
             className="bg-slate-700 border-slate-600 text-white"
           />
         </div>
+
         <div className="flex gap-2 pt-4">
           <Button type="submit" className="bg-green-600 hover:bg-green-700">
-            {event ? 'Update Event' : 'Create Event'}
+            {event ? 'Update Evento' : 'Create Evento'}
           </Button>
-          <Button type="button" variant="outline" onClick={onClose} className="border-slate-600 text-white hover:bg-slate-700">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onClose}
+            className="border-slate-600 text-white hover:bg-slate-700"
+          >
             Cancel
           </Button>
         </div>
       </form>
+
+      {/* Media Picker Modal */}
+      {showMediaPicker && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Select Featured Image</h3>
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowMediaPicker(false)}
+                className="text-white hover:bg-slate-700"
+              >
+                ✕
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {mediaItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="cursor-pointer border-2 border-transparent hover:border-green-400 rounded-lg overflow-hidden"
+                  onClick={() => {
+                    setFormData(prev => ({...prev, featured_media: item.id}));
+                    setShowMediaPicker(false);
+                  }}
+                >
+                  <img src={item.thumbnail} alt={item.title} className="w-full h-32 object-cover" />
+                  <div className="p-2">
+                    <p className="text-white text-xs truncate">{item.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </DialogContent>
   );
 };
