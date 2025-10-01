@@ -633,6 +633,75 @@ async def delete_event(event_id: int):
             detail=f"Failed to delete event: {str(e)}"
         )
 
+# Event Categories Management
+@api_router.get("/event-categories")
+async def get_event_categories():
+    """Get all event categories (categorie_eventi taxonomy)"""
+    config = await get_wp_config()
+    wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
+    
+    try:
+        categories = await wp_api.get("categorie_eventi", {"per_page": 100})
+        return {
+            "success": True,
+            "data": [
+                {
+                    "id": cat["id"],
+                    "name": cat["name"],
+                    "slug": cat["slug"],
+                    "description": cat["description"],
+                    "count": cat["count"]
+                }
+                for cat in categories
+            ]
+        }
+        
+    except Exception as e:
+        print(f"Failed to fetch event categories: {e}")
+        # Return empty list if taxonomy doesn't exist yet
+        return {
+            "success": True,
+            "data": [],
+            "message": "Event categories taxonomy not found or empty"
+        }
+
+# Media Management for Events
+@api_router.get("/media")
+async def get_media(page: int = 1, per_page: int = 20):
+    """Get media library items for featured images"""
+    config = await get_wp_config()
+    wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
+    
+    try:
+        media = await wp_api.get("media", {
+            "page": page,
+            "per_page": per_page,
+            "media_type": "image"
+        })
+        
+        return {
+            "success": True,
+            "data": [
+                {
+                    "id": item["id"],
+                    "title": item["title"]["rendered"],
+                    "url": item["source_url"],
+                    "thumbnail": item.get("media_details", {}).get("sizes", {}).get("thumbnail", {}).get("source_url", item["source_url"]),
+                    "medium": item.get("media_details", {}).get("sizes", {}).get("medium", {}).get("source_url", item["source_url"]),
+                    "alt_text": item["alt_text"],
+                    "date": item["date"]
+                }
+                for item in media
+            ]
+        }
+        
+    except Exception as e:
+        print(f"Failed to fetch media: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Failed to fetch media: {str(e)}"
+        )
+
 # WordPress Site Info
 @api_router.get("/site-info")
 async def get_site_info():
