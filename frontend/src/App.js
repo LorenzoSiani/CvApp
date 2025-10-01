@@ -1066,33 +1066,96 @@ const AnalyticsTab = () => {
 // Event Modal Component
 const EventModal = ({ onSubmit, event, onClose }) => {
   const [formData, setFormData] = useState({
-    title: event?.title || '',
-    content: event?.content || '',
+    title: '',
+    content: '',
+    data_evento: '',
+    ora_evento: '',
+    luogo_evento: '',
     location: '',
-    event_date: '',
-    featured_image_url: ''
+    dj: '',
+    host: '',
+    guest: '',
+    categorie_eventi: [],
+    featured_media: null
   });
+
+  const [categories, setCategories] = useState([]);
+  const [mediaItems, setMediaItems] = useState([]);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+
+  // Load categories and media on mount
+  useEffect(() => {
+    loadCategories();
+    loadMedia();
+  }, []);
 
   // Update form data when event prop changes (for editing)
   useEffect(() => {
     if (event) {
       setFormData({
         title: event.title || '',
-        content: event.content?.replace(/<[^>]*>/g, '') || '', // Strip HTML for editing
-        location: '', // You might want to extract this from meta fields
-        event_date: '',
-        featured_image_url: ''
+        content: event.content?.replace(/<[^>]*>/g, '') || '',
+        data_evento: event.data_evento || '',
+        ora_evento: event.ora_evento || '',
+        luogo_evento: event.luogo_evento || '',
+        location: event.location || '',
+        dj: event.dj || '',
+        host: event.host || '',
+        guest: event.guest || '',
+        categorie_eventi: event.categorie_eventi || [],
+        featured_media: event.featured_media || null
       });
     }
   }, [event]);
+
+  const loadCategories = async () => {
+    try {
+      const response = await axios.get(`${API}/event-categories`);
+      setCategories(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+    }
+  };
+
+  const loadMedia = async () => {
+    try {
+      const response = await axios.get(`${API}/media?per_page=50`);
+      setMediaItems(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to load media:', error);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
     if (!event) {
-      setFormData({ title: '', content: '', location: '', event_date: '', featured_image_url: '' });
+      setFormData({
+        title: '',
+        content: '',
+        data_evento: '',
+        ora_evento: '',
+        luogo_evento: '',
+        location: '',
+        dj: '',
+        host: '',
+        guest: '',
+        categorie_eventi: [],
+        featured_media: null
+      });
     }
   };
+
+  const handleCategoryChange = (categoryId) => {
+    setFormData(prev => ({
+      ...prev,
+      categorie_eventi: prev.categorie_eventi.includes(categoryId)
+        ? prev.categorie_eventi.filter(id => id !== categoryId)
+        : [...prev.categorie_eventi, categoryId]
+    }));
+  };
+
+  const selectedMedia = mediaItems.find(item => item.id === formData.featured_media);
 
   return (
     <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
