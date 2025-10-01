@@ -532,14 +532,29 @@ async def create_event(event: CreateEventRequest):
         "content": event.content,
         "status": "publish",
         "meta": {
-            "event_location": event.location,
-            "event_date": event.event_date
+            "data_evento": event.data_evento,
+            "ora_evento": event.ora_evento,
+            "luogo_evento": event.luogo_evento
         }
     }
     
-    # Add featured image if provided
-    if event.featured_image_url:
-        event_data["featured_image_url"] = event.featured_image_url
+    # Add optional meta fields
+    if event.location:
+        event_data["meta"]["location"] = event.location
+    if event.dj:
+        event_data["meta"]["dj"] = event.dj
+    if event.host:
+        event_data["meta"]["host"] = event.host
+    if event.guest:
+        event_data["meta"]["guest"] = event.guest
+    
+    # Add categories if provided
+    if event.categorie_eventi:
+        event_data["categorie_eventi"] = event.categorie_eventi
+    
+    # Add featured media if provided
+    if event.featured_media:
+        event_data["featured_media"] = event.featured_media
     
     try:
         result = await wp_api.post("eventi", event_data)
