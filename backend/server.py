@@ -481,7 +481,7 @@ async def get_events(page: int = 1, per_page: int = 10):
             detail=f"Failed to fetch events: {str(e)}"
         )
 
-@api_router.get("/events/{event_id}", response_model=WordPressPost)
+@api_router.get("/events/{event_id}", response_model=EventResponse)
 async def get_event(event_id: int):
     """Get a single event by ID"""
     config = await get_wp_config()
@@ -490,17 +490,29 @@ async def get_event(event_id: int):
     try:
         event = await wp_api.get(f"eventi/{event_id}", {"_embed": True})
         
-        return WordPressPost(
+        return EventResponse(
             id=event["id"],
             title=event["title"]["rendered"],
             content=event["content"]["rendered"],
             status=event["status"],
             type=event.get("type", "evento"),
-            featured_media=event.get("featured_media"),
+            featured_media=event.get("featured_media", 0) or None,
             date=event["date"],
             modified=event["modified"],
             link=event["link"],
-            excerpt=event["excerpt"]["rendered"]
+            excerpt=event["excerpt"]["rendered"],
+            
+            # Extract meta fields
+            data_evento=event.get("meta", {}).get("data_evento", [""])[0] if event.get("meta", {}).get("data_evento") else None,
+            ora_evento=event.get("meta", {}).get("ora_evento", [""])[0] if event.get("meta", {}).get("ora_evento") else None,
+            luogo_evento=event.get("meta", {}).get("luogo_evento", [""])[0] if event.get("meta", {}).get("luogo_evento") else None,
+            location=event.get("meta", {}).get("location", [""])[0] if event.get("meta", {}).get("location") else None,
+            dj=event.get("meta", {}).get("dj", [""])[0] if event.get("meta", {}).get("dj") else None,
+            host=event.get("meta", {}).get("host", [""])[0] if event.get("meta", {}).get("host") else None,
+            guest=event.get("meta", {}).get("guest", [""])[0] if event.get("meta", {}).get("guest") else None,
+            
+            # Extract categories
+            categorie_eventi=event.get("categorie_eventi", [])
         )
         
     except Exception as e:
