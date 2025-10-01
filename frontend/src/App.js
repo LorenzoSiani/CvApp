@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Badge } from './components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './components/ui/dialog';
 import { Textarea } from './components/ui/textarea';
-import { AlertCircle, Settings, Package, Calendar, Plus, Edit, Trash2, ExternalLink, Wifi, WifiOff, BarChart3, TrendingUp, Users, Eye } from 'lucide-react';
+import { AlertCircle, Settings, Package, Calendar, Plus, Edit, Trash2, ExternalLink, Wifi, WifiOff, BarChart3, TrendingUp, Users, Eye, MapPin } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
