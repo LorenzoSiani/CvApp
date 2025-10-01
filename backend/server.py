@@ -133,26 +133,75 @@ class WordPressProduct(BaseModel):
 class CreateEventRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     content: str = Field(..., max_length=10000)
-    location: str = Field(..., min_length=1, max_length=200)
-    event_date: str = Field(..., pattern=r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}')
-    featured_image_url: Optional[str] = Field(None, max_length=500)
     
-    @field_validator('title', 'location')
+    # Meta fields
+    data_evento: str = Field(..., description="Event date (YYYY-MM-DD)")
+    ora_evento: str = Field(..., description="Event time (HH:MM)")
+    luogo_evento: str = Field(..., min_length=1, max_length=200, description="Event venue")
+    location: Optional[str] = Field(None, max_length=200, description="Additional location info")
+    dj: Optional[str] = Field(None, max_length=200, description="DJ name")
+    host: Optional[str] = Field(None, max_length=200, description="Host name")
+    guest: Optional[str] = Field(None, max_length=500, description="Guest information")
+    
+    # Categories and media
+    categorie_eventi: Optional[List[int]] = Field(default=[], description="Event category IDs")
+    featured_media: Optional[int] = Field(None, description="Featured image media ID")
+    
+    @field_validator('title', 'luogo_evento', 'location', 'dj', 'host')
     @classmethod
     def sanitize_text_fields(cls, v):
-        return bleach.clean(v, tags=[], strip=True)
-    
-    @field_validator('content')
-    @classmethod
-    def sanitize_content(cls, v):
-        return sanitize_html(v)
-    
-    @field_validator('featured_image_url')
-    @classmethod
-    def validate_image_url(cls, v):
-        if v and not v.startswith(('http://', 'https://')):
-            raise ValueError('Image URL must start with http:// or https://')
+        if v:
+            return bleach.clean(v, tags=[], strip=True)
         return v
+    
+    @field_validator('content', 'guest')
+    @classmethod
+    def sanitize_content_fields(cls, v):
+        if v:
+            return sanitize_html(v)
+        return v
+    
+    @field_validator('data_evento')
+    @classmethod
+    def validate_event_date(cls, v):
+        try:
+            datetime.strptime(v, '%Y-%m-%d')
+            return v
+        except ValueError:
+            raise ValueError('Event date must be in YYYY-MM-DD format')
+    
+    @field_validator('ora_evento')
+    @classmethod
+    def validate_event_time(cls, v):
+        try:
+            datetime.strptime(v, '%H:%M')
+            return v
+        except ValueError:
+            raise ValueError('Event time must be in HH:MM format')
+
+class EventResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    status: str
+    type: str
+    featured_media: Optional[int] = None
+    date: str
+    modified: str
+    link: str
+    excerpt: str
+    
+    # Meta fields
+    data_evento: Optional[str] = None
+    ora_evento: Optional[str] = None
+    luogo_evento: Optional[str] = None
+    location: Optional[str] = None
+    dj: Optional[str] = None
+    host: Optional[str] = None
+    guest: Optional[str] = None
+    
+    # Categories
+    categorie_eventi: Optional[List[int]] = []
 
 class CreateProductRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
