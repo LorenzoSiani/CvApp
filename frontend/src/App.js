@@ -576,21 +576,59 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
 
 // Component for individual event cards
 const EventCard = ({ event, onEdit, onDelete }) => {
+  const formatEventDateTime = (data_evento, ora_evento) => {
+    if (!data_evento) return null;
+    const date = new Date(data_evento);
+    const dateStr = date.toLocaleDateString('it-IT', { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+    return ora_evento ? `${dateStr} alle ${ora_evento}` : dateStr;
+  };
+
   return (
     <Card className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/15 transition-all duration-300">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-white text-lg line-clamp-2">{event.title}</CardTitle>
-            <div className="flex gap-2 mt-2">
+            
+            {/* Event Details */}
+            <div className="mt-2 space-y-1">
+              {event.data_evento && (
+                <div className="flex items-center gap-2 text-sm text-green-300">
+                  <Calendar className="w-3 h-3" />
+                  {formatEventDateTime(event.data_evento, event.ora_evento)}
+                </div>
+              )}
+              {event.luogo_evento && (
+                <div className="flex items-center gap-2 text-sm text-blue-300">
+                  <MapPin className="w-3 h-3" />
+                  {event.luogo_evento}
+                </div>
+              )}
+              {(event.dj || event.host) && (
+                <div className="flex items-center gap-2 text-sm text-purple-300">
+                  <Users className="w-3 h-3" />
+                  {[event.dj && `DJ: ${event.dj}`, event.host && `Host: ${event.host}`]
+                    .filter(Boolean)
+                    .join(' • ')}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2 mt-3">
               <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/20">
-                {event.type === 'evento' ? 'Evento' : 'Event'}
+                Evento
               </Badge>
               <Badge variant="outline" className="border-white/20 text-gray-300">
                 {event.status}
               </Badge>
             </div>
           </div>
+          
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -619,16 +657,24 @@ const EventCard = ({ event, onEdit, onDelete }) => {
           </div>
         </div>
       </CardHeader>
+      
       <CardContent>
         <div 
-          className="text-gray-300 text-sm line-clamp-3" 
+          className="text-gray-300 text-sm line-clamp-2 mb-3" 
           dangerouslySetInnerHTML={{ __html: event.excerpt }} 
         />
-        <div className="text-xs text-gray-400 mt-2">
-          Created: {new Date(event.date).toLocaleDateString()}
+        
+        {event.guest && (
+          <div className="text-xs text-yellow-300 mb-2">
+            <strong>Ospiti:</strong> {event.guest}
+          </div>
+        )}
+        
+        <div className="text-xs text-gray-400">
+          Creato: {new Date(event.date).toLocaleDateString('it-IT')}
           {event.modified !== event.date && (
             <span className="ml-2">
-              • Updated: {new Date(event.modified).toLocaleDateString()}
+              • Aggiornato: {new Date(event.modified).toLocaleDateString('it-IT')}
             </span>
           )}
         </div>
