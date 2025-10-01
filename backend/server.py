@@ -432,7 +432,7 @@ async def delete_product(product_id: int):
     return result
 
 # Events Management (using custom post type 'eventi')
-@api_router.get("/events", response_model=List[WordPressPost])
+@api_router.get("/events", response_model=List[EventResponse])
 async def get_events(page: int = 1, per_page: int = 10):
     config = await get_wp_config()
     wp_api = WordPressAPI(config.site_url, config.username, config.app_password)
@@ -447,17 +447,29 @@ async def get_events(page: int = 1, per_page: int = 10):
         print(f"Found {len(events)} events from /eventi endpoint")
         
         return [
-            WordPressPost(
+            EventResponse(
                 id=event["id"],
                 title=event["title"]["rendered"],
                 content=event["content"]["rendered"],
                 status=event["status"],
                 type=event.get("type", "evento"),
-                featured_media=event.get("featured_media"),
+                featured_media=event.get("featured_media", 0) or None,
                 date=event["date"],
                 modified=event["modified"],
                 link=event["link"],
-                excerpt=event["excerpt"]["rendered"]
+                excerpt=event["excerpt"]["rendered"],
+                
+                # Extract meta fields
+                data_evento=event.get("meta", {}).get("data_evento", [""])[0] if event.get("meta", {}).get("data_evento") else None,
+                ora_evento=event.get("meta", {}).get("ora_evento", [""])[0] if event.get("meta", {}).get("ora_evento") else None,
+                luogo_evento=event.get("meta", {}).get("luogo_evento", [""])[0] if event.get("meta", {}).get("luogo_evento") else None,
+                location=event.get("meta", {}).get("location", [""])[0] if event.get("meta", {}).get("location") else None,
+                dj=event.get("meta", {}).get("dj", [""])[0] if event.get("meta", {}).get("dj") else None,
+                host=event.get("meta", {}).get("host", [""])[0] if event.get("meta", {}).get("host") else None,
+                guest=event.get("meta", {}).get("guest", [""])[0] if event.get("meta", {}).get("guest") else None,
+                
+                # Extract categories
+                categorie_eventi=event.get("categorie_eventi", [])
             )
             for event in events
         ]
