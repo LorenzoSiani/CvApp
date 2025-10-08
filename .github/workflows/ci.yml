@@ -200,11 +200,12 @@ jobs:
       run: |
         echo "🚀 Deploying to production..."
         echo "This step would typically deploy to your hosting platform"
-        echo "For Emergent platform, this would trigger the deployment process"
+        echo "Configure this section for your specific deployment target"
         
         # Example deployment steps:
         # - Build Docker images
-        # - Push to container registry
+        # - Push to container registry (DockerHub, AWS ECR, etc.)
+        # - Deploy to hosting platform (AWS, Google Cloud, VPS, etc.)
         # - Update production environment
         # - Run post-deployment tests
         
