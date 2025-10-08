@@ -208,15 +208,25 @@ docker-compose up -d
 ```
 
 ### Manual Deployment
-1. Set up production MongoDB instance
+1. Set up production MongoDB instance (MongoDB Atlas recommended)
 2. Configure production environment variables
 3. Build frontend: `yarn build`
-4. Deploy backend with a WSGI server (Gunicorn)
+4. Deploy backend with a WSGI server (Gunicorn/Uvicorn)
 5. Set up reverse proxy (Nginx) for HTTPS
+6. Configure SSL certificates
+7. Set up domain and DNS
 
 ### Environment-Specific Configurations
 - **Development**: Use local MongoDB and HTTP
 - **Production**: Use MongoDB Atlas, HTTPS, and production domains
+- **Staging**: Similar to production but with test data
+
+### Deployment Platforms
+This app can be deployed on various platforms:
+- **VPS/Dedicated Server** - Full control with Docker
+- **Cloud Platforms** - AWS, Google Cloud, Azure
+- **Container Services** - Docker containers on any host
+- **Traditional Hosting** - With Node.js and Python support
 
 ## 🔒 Security Considerations
 
