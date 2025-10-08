@@ -211,6 +211,7 @@ yarn test
 4. Deploy in under 10 minutes!
 
 **Detailed Instructions**: See [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md)
+**Troubleshooting**: See [RENDER_TROUBLESHOOTING.md](./RENDER_TROUBLESHOOTING.md)
 
 ### Using Docker (Local/VPS)
 ```bash
