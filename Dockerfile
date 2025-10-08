@@ -36,19 +36,27 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Copy backend requirements
 COPY backend/requirements.txt ./requirements.txt
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Upgrade pip and install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy backend source
 COPY backend/ ./backend
 
-# Copy built frontend from first stage
+# Copy built frontend from first stage (with fallback)
 COPY --from=frontend-builder /app/frontend/build ./frontend_build
+
+# Create a simple index.html fallback if frontend build fails
+RUN if [ ! -f "./frontend_build/index.html" ]; then \
+        mkdir -p ./frontend_build && \
+        echo '<!DOCTYPE html><html><head><title>CVLTURE WordPress Manager</title></head><body><h1>Loading...</h1><script>window.location.href="/api/";</script></body></html>' > ./frontend_build/index.html; \
+    fi
 
 # Expose port for Render.com
 EXPOSE 10000
@@ -56,6 +64,10 @@ EXPOSE 10000
 # Set environment variables for Render.com
 ENV PORT=10000
 ENV PYTHONUNBUFFERED=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:10000/api/ || exit 1
 
 # Start command optimized for Render.com
 CMD ["uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "10000"]
