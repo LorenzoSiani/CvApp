@@ -30,7 +30,11 @@ const LoadingScreen = ({ onComplete }) => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-500 to-slate-900 flex items-center justify-center">
       <div className="text-center">
         <div className="w-48 h-48 mx-auto mb-8 flex items-center justify-center">
-          <div className="text-8xl font-bold text-green-400">Λ</div>
+          <img 
+            src="/assets/logo.svg" 
+            alt="CVLTURE Logo" 
+            className="w-32 h-32 animate-pulse"
+          />
         </div>
         <div className="animate-pulse">
           <div className="w-64 h-2 bg-green-400/30 rounded-full mx-auto">
