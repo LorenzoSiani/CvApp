@@ -951,6 +951,25 @@ async def analytics_health_check():
 # Include the router in the main app
 app.include_router(api_router)
 
+# Serve static files from frontend build (for production)
+frontend_build_dir = Path(__file__).parent.parent / "frontend_build"
+if frontend_build_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(frontend_build_dir / "static")), name="static")
+    
+    # Serve React app for all non-API routes
+    @app.get("/{full_path:path}")
+    async def serve_react_app(full_path: str):
+        # Don't serve React app for API routes
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API route not found")
+        
+        # Serve index.html for all other routes (React Router will handle routing)
+        index_file = frontend_build_dir / "index.html"
+        if index_file.exists():
+            return FileResponse(str(index_file))
+        else:
+            raise HTTPException(status_code=404, detail="Frontend not found")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
