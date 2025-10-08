@@ -3,20 +3,28 @@ FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Install npm latest version and clear cache
-RUN npm install -g npm@latest && npm cache clean --force
+# Update npm and clear cache
+RUN npm install -g npm@10.8.2 && npm cache clean --force
 
-# Copy package files (using npm instead of yarn)
+# Copy package files
 COPY frontend/package*.json ./
 
-# Install dependencies with legacy peer deps to handle conflicts
-RUN npm install --legacy-peer-deps --no-optional
+# Create .npmrc file to handle peer dependency issues
+RUN echo "legacy-peer-deps=true" > .npmrc && \
+    echo "fund=false" >> .npmrc && \
+    echo "audit=false" >> .npmrc
+
+# Install dependencies with error handling
+RUN npm ci --legacy-peer-deps --no-optional --no-fund --no-audit || \
+    npm install --legacy-peer-deps --no-optional --no-fund --no-audit
 
 # Copy frontend source
 COPY frontend/ ./
 
-# Build frontend with increased memory limit
+# Build frontend with optimizations
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV CI=true
+ENV GENERATE_SOURCEMAP=false
 RUN npm run build
 
 # Python backend stage
