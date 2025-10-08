@@ -42,6 +42,32 @@ If the main Dockerfile still fails, try these alternatives:
 }
 ```
 
+### **Error: ajv/ajv-keywords conflict**
+
+**Error Message:**
+```
+Error: Cannot find module 'ajv/dist/compile/codegen'
+```
+
+**Solutions:**
+
+**1. Use Updated Package.json (Applied):**
+The package.json now includes dependency overrides:
+```json
+"overrides": {
+  "ajv": "^8.12.0",
+  "ajv-keywords": "^5.1.0"
+}
+```
+
+**2. Use No-CRACO Dockerfile:**
+CRACO sometimes causes ajv conflicts. Use `Dockerfile.nocraco` which:
+- Uses `react-scripts` instead of `craco`
+- Avoids complex webpack configurations
+
+**3. Emergency Minimal Deployment:**
+Use `Dockerfile.minimal` to get the API working immediately with a simple HTML frontend.
+
 ### **Error: Frontend build fails**
 
 **Symptoms:**
