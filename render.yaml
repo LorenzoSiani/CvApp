@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: cvlture-wordpress-manager
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/
+    envVars:
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: wordpress_manager_db
+      - key: CORS_ORIGINS
+        value: https://cvlture-wordpress-manager.onrender.com
+      - key: PORT
+        value: 10000
+      - key: PYTHONUNBUFFERED
+        value: 1
