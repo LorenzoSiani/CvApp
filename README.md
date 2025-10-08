@@ -2,7 +2,7 @@
 
 A modern, full-stack WordPress management application that provides a beautiful interface for managing WordPress content, WooCommerce products, and custom events.
 
-![CVLTURE Logo](https://customer-assets.emergentagent.com/job_wp-connect/artifacts/vgk59obo_cropped-cropped-CVLTURE_Monogram_LOCAN_066-1.png)
+![CVLTURE Logo](./assets/cvlture-logo.png)
 
 ## ✨ Features
 
