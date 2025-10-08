@@ -1,0 +1,89 @@
+# Minimal Dockerfile for emergency deployment
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Install only essential Python packages
+RUN pip install fastapi==0.110.1 uvicorn==0.25.0 motor==3.3.1 python-dotenv==1.1.1 pydantic==2.11.7
+
+# Copy backend source
+COPY backend/ ./backend/
+
+# Create a simple HTML frontend fallback
+RUN mkdir -p ./frontend_build && \
+    cat > ./frontend_build/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVLTURE WordPress Manager</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: linear-gradient(135deg, #0f172a 0%, #00ff49 50%, #0f172a 100%);
+            color: white; 
+            margin: 0; 
+            padding: 2rem; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container { 
+            text-align: center; 
+            background: rgba(255,255,255,0.1); 
+            padding: 2rem; 
+            border-radius: 1rem; 
+            backdrop-filter: blur(10px);
+        }
+        .logo { 
+            font-size: 4rem; 
+            margin-bottom: 1rem; 
+        }
+        a { 
+            color: #00ff49; 
+            text-decoration: none; 
+            padding: 0.5rem 1rem; 
+            background: rgba(0,255,73,0.2); 
+            border-radius: 0.5rem;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        a:hover { 
+            background: rgba(0,255,73,0.3); 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Λ</div>
+        <h1>CVLTURE WordPress Manager</h1>
+        <p>Modern WordPress Management Interface</p>
+        <div>
+            <a href="/api/">API Documentation</a>
+            <a href="https://www.cvlture.it" target="_blank">Visit CVLTURE.it</a>
+        </div>
+        <p style="margin-top: 2rem; opacity: 0.7; font-size: 0.9rem;">
+            This is a minimal version. The full React frontend will be available after resolving build dependencies.
+        </p>
+    </div>
+</body>
+</html>
+EOF
+
+# Environment variables
+ENV PORT=10000
+ENV PYTHONUNBUFFERED=1
+EXPOSE 10000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:10000/api/ || exit 1
+
+# Start command
+CMD ["uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "10000"]
