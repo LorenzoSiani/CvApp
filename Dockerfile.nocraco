@@ -1,0 +1,70 @@
+# Alternative Dockerfile without CRACO for Render.com
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Install npm and clear cache
+RUN npm install -g npm@10.8.2 && npm cache clean --force
+
+# Copy package files
+COPY frontend/package*.json ./
+
+# Install dependencies with legacy peer deps
+RUN npm install --legacy-peer-deps --no-optional
+
+# Copy frontend source
+COPY frontend/ ./
+
+# Modify package.json to use react-scripts directly instead of craco
+RUN sed -i 's/"craco build"/"react-scripts build"/' package.json && \
+    sed -i 's/"craco start"/"react-scripts start"/' package.json && \
+    sed -i 's/"craco test"/"react-scripts test"/' package.json
+
+# Build with react-scripts instead of craco
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV CI=true
+ENV GENERATE_SOURCEMAP=false
+RUN npm run build
+
+# Backend stage
+FROM python:3.11-slim AS backend
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copy backend requirements
+COPY backend/requirements.txt ./requirements.txt
+
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy backend source
+COPY backend/ ./backend
+
+# Copy built frontend from first stage
+COPY --from=frontend-builder /app/frontend/build ./frontend_build
+
+# Create fallback index if build fails
+RUN if [ ! -f "./frontend_build/index.html" ]; then \
+        mkdir -p ./frontend_build && \
+        echo '<!DOCTYPE html><html><head><title>CVLTURE</title></head><body><h1>CVLTURE WordPress Manager</h1><p><a href="/api/">API</a></p></body></html>' > ./frontend_build/index.html; \
+    fi
+
+# Expose port and set environment
+EXPOSE 10000
+ENV PORT=10000
+ENV PYTHONUNBUFFERED=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:10000/api/ || exit 1
+
+# Start command
+CMD ["uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "10000"]
