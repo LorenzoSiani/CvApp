@@ -262,6 +262,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **WordPress REST API** - Content management backbone
 - **Shadcn/UI** - Beautiful UI components
 - **FastAPI** - High-performance backend framework
+- **React** - Frontend framework
+- **MongoDB** - Database solution
 
 ## 📞 Support
 
