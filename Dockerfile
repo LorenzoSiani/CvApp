@@ -3,16 +3,20 @@ FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
+# Install npm latest version and clear cache
+RUN npm install -g npm@latest && npm cache clean --force
+
 # Copy package files (using npm instead of yarn)
 COPY frontend/package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with legacy peer deps to handle conflicts
+RUN npm install --legacy-peer-deps --no-optional
 
 # Copy frontend source
 COPY frontend/ ./
 
-# Build frontend
+# Build frontend with increased memory limit
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
 # Python backend stage
