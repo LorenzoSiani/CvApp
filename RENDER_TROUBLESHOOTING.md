@@ -47,11 +47,29 @@ If the main Dockerfile still fails, try these alternatives:
 }
 ```
 
-### **Error: ajv/ajv-keywords conflict**
+### **Error: Node version mismatch**
 
 **Error Message:**
 ```
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'react-router-dom@7.9.3',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+```
+
+**Solutions:**
+
+**1. Updated Dockerfile (Applied):**
+Changed from `node:18-alpine` to `node:20-alpine` to meet React Router requirements.
+
+**2. Downgraded React Router (Applied):**
+Changed `react-router-dom` from `^7.5.1` to `^6.26.2` for better compatibility.
+
+### **Error: ajv/ajv-keywords conflict**
+
+**Error Messages:**
+```
 Error: Cannot find module 'ajv/dist/compile/codegen'
+Error: Unknown keyword formatMinimum
 ```
 
 **Solutions:**
