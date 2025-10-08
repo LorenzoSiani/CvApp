@@ -9,23 +9,29 @@ RUN npm install -g npm@10.8.2 && npm cache clean --force
 # Copy package files
 COPY frontend/package*.json ./
 
-# Create .npmrc file to handle peer dependency issues
+# Create .npmrc file to handle peer dependency issues and dependency resolution
 RUN echo "legacy-peer-deps=true" > .npmrc && \
     echo "fund=false" >> .npmrc && \
     echo "audit=false" >> .npmrc
 
-# Install dependencies with error handling
-RUN npm ci --legacy-peer-deps --no-optional --no-fund --no-audit || \
-    npm install --legacy-peer-deps --no-optional --no-fund --no-audit
+# Install dependencies with specific fixes for ajv conflicts
+RUN npm install --legacy-peer-deps --no-optional --no-fund --no-audit
+
+# Fix ajv/ajv-keywords conflict by installing compatible versions
+RUN npm install ajv@^8.12.0 ajv-keywords@^5.1.0 --save --legacy-peer-deps
 
 # Copy frontend source
 COPY frontend/ ./
 
-# Build frontend with optimizations
+# Build frontend with optimizations and error handling
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV CI=true
 ENV GENERATE_SOURCEMAP=false
-RUN npm run build
+
+# Try multiple build strategies
+RUN npm run build || \
+    (npm install --force && npm run build) || \
+    (rm -rf node_modules && npm install --legacy-peer-deps && npm run build)
 
 # Python backend stage
 FROM python:3.11-slim AS backend
