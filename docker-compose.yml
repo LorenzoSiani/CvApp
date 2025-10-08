@@ -21,17 +21,17 @@ services:
     environment:
       - MONGO_URL=mongodb://mongodb:27017
       - DB_NAME=wordpress_manager_db
-      - CORS_ORIGINS=http://localhost:3000,https://your-domain.com
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:10000,https://your-domain.com
+      - PORT=10000
+      - PYTHONUNBUFFERED=1
     ports:
-      - "8001:8001"
+      - "10000:10000"
     depends_on:
       - mongodb
     networks:
       - wordpress-manager-network
-    volumes:
-      - ./backend:/app
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/api/"]
+      test: ["CMD", "curl", "-f", "http://localhost:10000/api/"]
       interval: 30s
       timeout: 10s
       retries: 3
