@@ -1,5 +1,5 @@
 # Multi-stage Docker build for WordPress Management App optimized for Render.com
-FROM node:18-alpine AS frontend-builder
+FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
