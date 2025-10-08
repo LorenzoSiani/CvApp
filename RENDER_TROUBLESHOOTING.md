@@ -18,11 +18,18 @@ RUN echo "legacy-peer-deps=true" > .npmrc
 RUN npm ci --legacy-peer-deps --no-optional || npm install --legacy-peer-deps
 ```
 
-**Solution 2 - Use Simple Dockerfile:**
-If the main Dockerfile still fails, try the backup:
+**Solution 2 - Use Alternative Dockerfiles:**
+If the main Dockerfile still fails, try these alternatives:
+
+**Option A - No CRACO (avoids ajv conflicts):**
 1. Rename `Dockerfile` to `Dockerfile.backup`
-2. Rename `Dockerfile.simple` to `Dockerfile`
+2. Rename `Dockerfile.nocraco` to `Dockerfile`
 3. Redeploy on Render
+
+**Option B - Minimal Version (emergency deployment):**
+1. Rename `Dockerfile` to `Dockerfile.backup`
+2. Rename `Dockerfile.minimal` to `Dockerfile`
+3. Redeploy - gets basic functionality working immediately
 
 **Solution 3 - Manual Package.json Fix:**
 ```bash
