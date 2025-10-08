@@ -85,8 +85,12 @@ const SetupPage = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 mx-auto mb-4 opacity-80 flex items-center justify-center bg-green-500/20 rounded-full">
-                <span className="text-2xl font-bold text-green-400">Λ</span>
+              <div className="w-16 h-16 mx-auto mb-4 opacity-80">
+                <img 
+                  src="/assets/logo.svg" 
+                  alt="CVLTURE" 
+                  className="w-full h-full"
+                />
               </div>
               <p className="text-green-400 text-sm">Connecting to CVLTURE WordPress Site</p>
             </div>
