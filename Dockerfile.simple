@@ -1,0 +1,47 @@
+# Simple Dockerfile for Render.com - Fallback option
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /app
+
+# Install dependencies globally to avoid conflicts
+RUN npm install -g npm@latest
+
+# Copy entire frontend directory
+COPY frontend/ ./frontend/
+
+WORKDIR /app/frontend
+
+# Try multiple installation strategies
+RUN npm install --legacy-peer-deps --force || \
+    npm install --legacy-peer-deps || \
+    npm install --force || \
+    (rm -rf node_modules package-lock.json && npm install)
+
+# Build with error handling
+RUN npm run build || npm run build --legacy-peer-deps
+
+# Backend stage
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# System dependencies
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Python dependencies
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend
+COPY backend/ ./backend/
+
+# Copy frontend build
+COPY --from=frontend-builder /app/frontend/build ./frontend_build/
+
+# Environment
+ENV PORT=10000
+ENV PYTHONUNBUFFERED=1
+EXPOSE 10000
+
+# Start
+CMD ["uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "10000"]
