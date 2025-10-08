@@ -201,7 +201,18 @@ yarn test
 
 ## 🚀 Deployment
 
-### Using Docker (Recommended)
+### Quick Deploy to Render.com (Recommended)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com)
+
+**One-click deployment:**
+1. Click the deploy button above
+2. Connect your GitHub repository
+3. Set environment variables (MongoDB URL, etc.)
+4. Deploy in under 10 minutes!
+
+**Detailed Instructions**: See [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md)
+
+### Using Docker (Local/VPS)
 ```bash
 # Build and run with docker-compose
 docker-compose up -d
@@ -210,8 +221,8 @@ docker-compose up -d
 ### Manual Deployment
 1. Set up production MongoDB instance (MongoDB Atlas recommended)
 2. Configure production environment variables
-3. Build frontend: `yarn build`
-4. Deploy backend with a WSGI server (Gunicorn/Uvicorn)
+3. Build frontend: `npm run build`
+4. Deploy backend with Uvicorn
 5. Set up reverse proxy (Nginx) for HTTPS
 6. Configure SSL certificates
 7. Set up domain and DNS
@@ -223,10 +234,22 @@ docker-compose up -d
 
 ### Deployment Platforms
 This app can be deployed on various platforms:
+- **Render.com** - Easiest deployment with Docker support (recommended)
+- **Vercel/Netlify** - For frontend + serverless backend
+- **Railway/Fly.io** - Docker-based hosting
 - **VPS/Dedicated Server** - Full control with Docker
 - **Cloud Platforms** - AWS, Google Cloud, Azure
 - **Container Services** - Docker containers on any host
-- **Traditional Hosting** - With Node.js and Python support
+
+### Production Environment Variables
+```bash
+# Required for production
+MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/
+DB_NAME=wordpress_manager_db
+CORS_ORIGINS=https://your-domain.com
+PORT=10000
+PYTHONUNBUFFERED=1
+```
 
 ## 🔒 Security Considerations
 
